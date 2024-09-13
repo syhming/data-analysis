@@ -1,0 +1,14 @@
+# python files for todo fasthtml app
+main.py
+weather.py
+
+# sqlite databases for the fasthtml app
+todos.db
+todos.db-shm
+todos.db-wal
+
+#folders
+/data
+/__pycache__
+#misc
+.sesskey
