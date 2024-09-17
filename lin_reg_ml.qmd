@@ -1,0 +1,240 @@
+---
+title: "Linear Regression Machine Learning demo"
+format:
+    html:
+        code-fold: true
+        code-overflow: wrap
+        link-external-filter: '^(?:http:|https:)\/\/www\.github\.com\/syhming\/data\-analysis\-projects'
+        other-links: 
+            - text: Back to homepage
+              href: https://syhming.github.io/data-analysis-projects/
+toc: true
+jupyter: python3
+---
+
+## Introduction
+A linear regression machine learning project from Codecademy. The dataset is on Men's professional tennis stats from 2009 to 2017.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.linear_model import LinearRegression
+
+df = pd.read_csv('tennis_stats.csv')
+#print(df.head())
+```
+
+```{python}
+print(df.info())
+
+# a function wrapper to make a scatterplot
+def make_scatter(x, y):
+    plt.scatter(x, y, alpha = 0.5)
+    plt.xlabel(str(x.name))
+    plt.ylabel(str(y.name))
+    plt.title(f'Plot of {y.name} by {x.name}')
+    plt.show()
+    plt.clf()
+```
+
+## Scatterplots
+Here we do some exploratory analysis.
+```{python}
+make_scatter(df.Aces, df.Wins)
+```
+
+```{python}
+make_scatter(df.ReturnPointsWon, df.Wins)
+```
+
+```{python}
+make_scatter(df.FirstServePointsWon, df.Wins)
+```
+
+```{python}
+make_scatter(df.FirstServePointsWon, df.Winnings)
+```
+
+```{python}
+make_scatter(df.BreakPointsOpportunities, df.Winnings)
+```
+
+```{python}
+make_scatter(df.ServiceGamesWon, df.Winnings)
+```
+
+We will want to work with the features that show linear relationships instead of curvilinear relationships. This is because we aren't building models with more complicated interactions or features of higher order, yet.
+
+## Linear Regression Models
+Now we set up some linear regression models and get their model scores.
+
+```{python}
+# function wrapping train-test splitting of data, fitting a linear model,
+# plotting the results with the model score
+def make_linear_model(features, outcome):
+    x_train, x_test, y_train, y_test = train_test_split(features, outcome, test_size=0.2)
+    model = LinearRegression()
+    model.fit(x_train, y_train)
+    ypred = model.predict(x_test)
+    plt.scatter(y_test, ypred, alpha=0.5)
+    if 'Wins' in outcome.columns:
+        plt.xlabel('Actual Wins')
+        plt.ylabel('Predicted Wins')
+        plt.title('Plot of Actual Wins by Predicted Wins')
+    if 'Winnings' in outcome.columns:
+        plt.xlabel('Actual Winnings')
+        plt.ylabel('Predicted Winnings')
+        plt.title('Plot of Actual Winnings by Predicted Winnings')
+    plt.annotate(f'$R^2$: {model.score(x_test, y_test):.6f}', xy=(np.max(y_test), np.max(ypred)))
+    
+    plt.show()
+    plt.clf()
+```
+
+```{python}
+features = df[['Aces']]
+outcome = df[['Wins']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['ServiceGamesWon']]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['Aces', 'TotalServicePointsWon']]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['Aces', 'BreakPointsConverted']]
+outcome = df[['Wins']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['Aces', 'BreakPointsConverted']]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['FirstServePointsWon',
+                'SecondServePointsWon', 
+                'BreakPointsConverted']]
+outcomes = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f"Mean of cross validation scores: {np.mean(cross_val_score(lin_mod, features, outcome, cv=5)):.5f}")
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['FirstServe',
+                'FirstServePointsWon',
+                'FirstServeReturnPointsWon',
+                'SecondServePointsWon',
+                'SecondServeReturnPointsWon',
+                'Aces',
+                'BreakPointsConverted',
+                'BreakPointsFaced',
+                'BreakPointsOpportunities',
+                'BreakPointsSaved',
+                'DoubleFaults',
+                'ReturnGamesPlayed',
+                'ReturnGamesWon',
+                'ReturnPointsWon',
+                'ServiceGamesPlayed',
+                'ServiceGamesWon',
+                'TotalPointsWon',
+                'TotalServicePointsWon']]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f"Mean of cross validation scores: {np.mean(cross_val_score(lin_mod, features, outcome, cv=5)):.5f}")
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[[
+    'FirstServePointsWon',
+    'FirstServeReturnPointsWon',
+    'SecondServePointsWon',
+    'SecondServeReturnPointsWon',
+    'Aces',
+    'BreakPointsConverted',
+    'BreakPointsOpportunities',
+    'BreakPointsSaved',
+    'ReturnGamesPlayed',
+    'ReturnGamesWon',
+    'ReturnPointsWon',
+    'ServiceGamesPlayed',
+    'ServiceGamesWon',
+    'TotalPointsWon',
+    'TotalServicePointsWon']]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+sns.heatmap(df.iloc[:, 1:-4].corr())
+plt.title("Heatmap of Feature Correlation")
+```
+
+```{python}
+features = df[['FirstServePointsWon',
+               'FirstServeReturnPointsWon',
+                'SecondServePointsWon',
+                'SecondServeReturnPointsWon',
+                'Aces',
+                'BreakPointsConverted',
+                'BreakPointsOpportunities',
+                'BreakPointsSaved',
+                'ReturnGamesPlayed',
+                'ReturnGamesWon',
+                'ReturnPointsWon',
+                'ServiceGamesPlayed',
+                'ServiceGamesWon',
+                'TotalPointsWon',
+                'TotalServicePointsWon'
+]]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+
+lin_mod = LinearRegression()
+lin_mod.fit(features, outcome)
+print(f"Mean of cross validation scores: {np.mean(cross_val_score(lin_mod, features, outcome, cv=5)):.5f}")
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
+
+```{python}
+features = df[['FirstServePointsWon',
+               'FirstServeReturnPointsWon',
+                'SecondServePointsWon',
+                'SecondServeReturnPointsWon',
+                'Aces',
+                'BreakPointsConverted',
+                'BreakPointsOpportunities',
+                'BreakPointsSaved',
+                'ReturnGamesWon',
+                'ReturnPointsWon',
+                'TotalPointsWon',
+                'TotalServicePointsWon'
+]]
+outcome = df[['Winnings']]
+make_linear_model(features, outcome)
+lin_mod = LinearRegression()
+lin_mod.fit(features, outcome)
+print(f"Mean of cross validation scores: {np.mean(cross_val_score(lin_mod, features, outcome, cv=5)):.5f}")
+print(f'List of features used in the model: {list(features.columns)}, \nand target: {list(outcome.columns)}')
+```
