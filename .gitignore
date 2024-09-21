@@ -1,6 +1,7 @@
 # python files for todo fasthtml app
 main.py
 weather.py
+breast_cancer_classifier.py
 
 # sqlite databases for the fasthtml app
 todos.db
