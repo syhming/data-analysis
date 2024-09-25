@@ -8,8 +8,12 @@ todos.db
 todos.db-shm
 todos.db-wal
 
+#data files
+Cost_of_Living_Index_by_Country_2024.csv
+
 #folders
 /data
 /__pycache__
+
 #misc
 .sesskey
